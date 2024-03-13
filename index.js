@@ -4,13 +4,6 @@ const path = require('path')
 const sharp = require('sharp')
 const { glob } = require('glob')
 
-
-console.log(`Start handle image......`)
-
-const imagePath = process.argv[3];
-const format = process.argv[2]
-
-
 function convertImageFormat(source, target) {
     console.log(`${source} ------ Stared~~~`)
     sharp(source)
@@ -26,6 +19,11 @@ function convertImageFormat(source, target) {
 }
 
 async function main() {
+    console.log(`Start handle image......`)
+
+    const imagePath = process.argv[3];
+    const format = process.argv[2]
+
     const isAbsolute = path.isAbsolute(imagePath)
     const files = await glob(imagePath);
 
