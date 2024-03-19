@@ -1,25 +1,39 @@
 #!/usr/bin/env node
 
-const path = require('path')
-const sharp = require('sharp')
-const { glob } = require('glob')
+import path from 'path';
+import sharp from 'sharp'
+import { glob } from 'glob'
+import chalk from 'chalk';
+import Ora from 'ora';
 
-function convertImageFormat(source, target) {
-    console.log(`${source} ------ Stared~~~`)
-    sharp(source)
-        .toFormat(format)
-        .toFile(target, (err, info) => {
-            if (err) {
-                console.error(err)
-                console.warn(`Current file is: ${source}\n`)
-            } else {
-                console.log(`${source} ------ Done!!!`)
-            }
-        });
+const spinner = Ora('Start to converting......');
+function converting(text){
+    spinner.start(text)
+}
+
+const { log, error, warn } = console;
+
+function convertImageFormat(source, target, format) {
+    converting(`${source}`)
+    return new Promise((resolve, reject) => {
+        sharp(source)
+            .toFormat(format)
+            .toFile(target, (err, info) => {
+                if (err) {
+                    log('\n'), spinner.fail(`Error!-${source}`)
+                    console.error(err, '\n');
+                } else {
+                    spinner.succeed(`Done-${source}`)
+                }
+                spinner.stop();
+
+                resolve();
+            });
+    })
 }
 
 async function main() {
-    console.log(`Start handle image......`)
+    converting();
 
     const imagePath = process.argv[3];
     const format = process.argv[2]
@@ -35,10 +49,11 @@ async function main() {
         const outputFileName = fileName.replace(/\.[\da-z]+$/gi, `.${format}`)
         const outputFilePath = path.dirname(filePath) + '/' + outputFileName;
 
-        convertImageFormat(filePath, outputFilePath)
+        await convertImageFormat(filePath, outputFilePath, format)
     }
 
-    console.log("Finished!")
+    spinner.info('\nALL FINISHED！！！')
+    // log(chalk.green("\nALL FINISHED!!!"))
 }
 
 main();
